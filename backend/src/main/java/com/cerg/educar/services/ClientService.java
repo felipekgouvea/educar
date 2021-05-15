@@ -5,6 +5,8 @@ import java.util.Optional;
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import com.cerg.educar.dto.ClientDTO;
 import com.cerg.educar.entities.Client;
 import com.cerg.educar.repositories.ClientRepository;
 import com.cerg.educar.services.exceptions.ControllerNotFoundException;
+import com.cerg.educar.services.exceptions.DataBaseException;
 
 @Service
 public class ClientService {
@@ -61,6 +64,16 @@ public class ClientService {
 			
 		} catch (EntityNotFoundException e) {
 			throw new ControllerNotFoundException("Cliente com código " + id + " não existe");
+		}
+	}
+
+	public void delete(Long id) {
+		try {
+			repository.deleteById(id);			
+		} catch (EmptyResultDataAccessException e) {
+			throw new ControllerNotFoundException("Cliente com código " + id + " não existe");
+		} catch (DataIntegrityViolationException e) {
+			throw new DataBaseException("Cliente não pode ser deletado");
 		}
 	}
 }
